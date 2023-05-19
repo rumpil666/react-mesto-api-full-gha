@@ -1,0 +1,10 @@
+.element__group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 246px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}

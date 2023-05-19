@@ -1,0 +1,11 @@
+.header__sign-out {
+    all: unset;
+    background-color: black;
+    color: #A9A9A9;
+    text-align: right;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+    margin-left: 24px;
+}

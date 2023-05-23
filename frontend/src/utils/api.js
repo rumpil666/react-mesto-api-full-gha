@@ -15,10 +15,6 @@ class Api {
     return fetch(url, options).then(this._checkResponse);
   }
 
-  getToken(jwt) {
-    this._headers.authorization = `Bearer ${jwt}`;
-  }
-
   getInitialCards() {
     return this._request(`${this._baseUrl}/cards`, {
       method: "GET",
@@ -83,6 +79,7 @@ class Api {
 const api = new Api({
   baseUrl: "https://api.rumpelstilzchen.nomoredomains.monster",
   headers: {
+    'authorization': `Bearer ${localStorage.getItem("jwt")}`,
     "Content-Type": "application/json",
   },
 });

@@ -97,6 +97,7 @@ function App() {
       .authorize(data)
       .then((data) => {
         localStorage.setItem("jwt", data.token);
+        api.getToken(data.token);
         setIsLoggedIn(true);
         setAuthorizationEmail(data.email);
         navigate("/");

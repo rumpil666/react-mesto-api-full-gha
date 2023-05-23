@@ -46,6 +46,7 @@ function App() {
       .then((data) => {
         setIsLoggedIn(true);
         setAuthorizationEmail(data.email);
+        api.getToken(jwt);
         navigate("/");
       })
       .catch((err) => console.log(err));
@@ -110,7 +111,6 @@ function App() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      console.log(localStorage.jwt);
     Promise.all([api.getInitialCards(), api.getUserInfo()])
       .then(([cards, user]) => {
         setCurrentUser(user);
@@ -120,7 +120,7 @@ function App() {
         console.log(`Ошибка: ${err}`);
       });
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigate]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);

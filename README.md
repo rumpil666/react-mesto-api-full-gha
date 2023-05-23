@@ -6,7 +6,7 @@
 
 ## Ссылки на проект
 
-IP 158.160.101.80
+IP 158.160.53.179
 
 Frontend https://rumpelstilzchen.nomoredomains.monster
 

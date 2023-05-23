@@ -25,21 +25,19 @@ export const register = ({ email, password }) => {
 };
 
 export const authorize = ({ email, password }) => {
-  console.log({ email, password });
   return request(`${BASE_URL}/signin`, {
     method: "POST",
     headers,
     body: JSON.stringify({ email, password }),
-    credentials: "include",
   })
 };
 
-export const checkToken = (token) => {
+export const checkToken = (jwt) => {
   return request(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
       ...headers,
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${jwt}`,
     },
   })
 };

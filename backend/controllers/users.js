@@ -7,15 +7,24 @@ const ConflictError = require('../errors/ConflictError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.send({ users }))
+module.exports.login = async (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.send({ token });
+    })
     .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res, next) => {
-  const { _id } = req.user;
-  User.findById(_id)
+module.exports.getUsers = async (req, res, next) => {
+  User.find({})
+    .then((users) => res.send(users))
+    .catch(next);
+};
+
+module.exports.getCurrentUser = async (req, res, next) => {
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
@@ -26,7 +35,7 @@ module.exports.getCurrentUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUser = (req, res, next) => {
+module.exports.createUser = async (req, res, next) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
@@ -38,10 +47,10 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then(() => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-      name,
-      about,
-      avatar,
+    .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
       email,
     }))
     .catch((e) => {
@@ -53,7 +62,7 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
-module.exports.getUserById = (req, res, next) => {
+module.exports.getUserById = async (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -65,7 +74,7 @@ module.exports.getUserById = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.updateUser = (req, res, next) => {
+module.exports.updateUser = async (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -82,7 +91,7 @@ module.exports.updateUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.updateAvatar = (req, res, next) => {
+module.exports.updateAvatar = async (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -95,16 +104,6 @@ module.exports.updateAvatar = (req, res, next) => {
       } else {
         res.send(user);
       }
-    })
-    .catch(next);
-};
-
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      return res.send({ token });
     })
     .catch(next);
 };

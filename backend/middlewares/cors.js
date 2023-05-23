@@ -3,11 +3,13 @@ const allowedCors = [
   'https://rumpelstilzchen.nomoredomains.monster',
 ];
 
+const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+
 module.exports = (req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
   const requestHeaders = req.headers['access-control-request-headers'];
-  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+
   res.header('Access-Control-Allow-Credentials', true);
 
   if (allowedCors.includes(origin)) {

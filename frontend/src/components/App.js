@@ -38,16 +38,23 @@ function App() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    Promise.all([api.getInitialCards(), api.getUserInfo()])
-      .then(([initialCards, userData]) => {
-        setCurrentUser(userData);
-        setCards(initialCards);
+  function handleTokenCheck() {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+    auth
+      .checkToken(jwt)
+      .then((data) => {
+        setIsLoggedIn(true);
+        setAuthorizationEmail(data.email);
+        navigate("/");
       })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-      });
-  }, []);
+      .catch((err) => console.log(err));
+    }
+  }
+
+  useEffect(() => {
+    handleTokenCheck();
+  }, [isLoggedIn]);
 
   function handleCardClick(card) {
     setSelectedCard(card);
@@ -68,6 +75,52 @@ function App() {
     setIsPopupWithConfirmationOpen(!isPopupWithConfirmationOpen);
     setRemovedCardId(cardId);
   }
+
+  function handleRegisration(data) {
+    return auth
+      .register(data)
+      .then(() => {
+        setIsRegistrationSuccessful(true);
+        navigate("/signin");
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+        setIsRegistrationSuccessful(false);  
+      })
+      .finally(() => {
+        openInfoTooltip();
+      })
+  }
+
+  function handleAuthorization(data) {
+    return auth
+      .authorize(data)
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
+        api.getToken(data.token);
+        setIsLoggedIn(true);
+        setAuthorizationEmail(data.email);
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+        openInfoTooltip();
+      })
+  }
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log(localStorage.jwt);
+    Promise.all([api.getInitialCards(), api.getUserInfo()])
+      .then(([cards, user]) => {
+        setCurrentUser(user);
+        setCards(cards);
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
+    }
+  }, [isLoggedIn]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -157,68 +210,17 @@ function App() {
     setSelectedCard({});
   };
 
-  function handleRegisration(data) {
-    return auth
-      .register(data)
-      .then(() => {
-        setIsRegistrationSuccessful(true);
-        navigate("/signin", { replace: true });
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-        setIsRegistrationSuccessful(false);  
-      })
-      .finally(() => {
-        openInfoTooltip();
-      })
-  }
-
-  function handleAuthorization(data) {
-    return auth
-      .authorize(data)
-      .then((data) => {
-        setIsLoggedIn(true);
-        localStorage.setItem("jwt", data.token);
-        handleTokenCheck();
-        navigate("/", { replace: true });
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-        openInfoTooltip();
-      })
-  }
-
   function handleSignOut() {
     setIsLoggedIn(false);
     localStorage.removeItem("jwt");
-    navigate("/signin", { replace: true });
+    navigate("/signin");
   }
-
-  function handleTokenCheck() {
-    const jwt = localStorage.getItem("jwt");
-    if (!jwt) {
-      return;
-    }
-    auth
-      .checkToken(jwt)
-      .then((data) => {
-        setAuthorizationEmail(data.email);
-        setIsLoggedIn(true);
-        navigate("/", { replace: true });      
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-    handleTokenCheck();
-  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/", { replace: true });
+      navigate("/");
     }
   }, [isLoggedIn, navigate]);
-
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

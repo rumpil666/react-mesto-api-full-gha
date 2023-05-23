@@ -13,7 +13,7 @@ const validationUrl = (url) => {
 const validationLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8).max(30),
+    password: Joi.string().required().min(8),
   }),
 });
 
@@ -23,7 +23,7 @@ const validationCreateUser = celebrate({
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom(validationUrl),
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8).max(30),
+    password: Joi.string().required().min(8),
   }),
 });
 

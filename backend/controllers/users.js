@@ -17,13 +17,13 @@ module.exports.login = async (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUsers = async (req, res, next) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(next);
 };
 
-module.exports.getCurrentUser = async (req, res, next) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -35,7 +35,7 @@ module.exports.getCurrentUser = async (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUser = async (req, res, next) => {
+module.exports.createUser = (req, res, next) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
@@ -62,7 +62,7 @@ module.exports.createUser = async (req, res, next) => {
     });
 };
 
-module.exports.getUserById = async (req, res, next) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -74,7 +74,7 @@ module.exports.getUserById = async (req, res, next) => {
     .catch(next);
 };
 
-module.exports.updateUser = async (req, res, next) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -91,7 +91,7 @@ module.exports.updateUser = async (req, res, next) => {
     .catch(next);
 };
 
-module.exports.updateAvatar = async (req, res, next) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
